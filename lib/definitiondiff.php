@@ -517,9 +517,9 @@ class Definitiondiff {
 					$drop_keys[] = "ALTER TABLE `$database_name`.`$table_name` DROP PRIMARY KEY;";
 				} elseif($diff['t1']['index_type'] == 'foreign'){
 					$fk_symbol = $diff['t1']['constraint'] ?? $keyname;
-					$drop_foreign_keys[] = "ALTER TABLE `$database_name`.`$table_name` DROP FOREIGN KEY $fk_symbol;";
+					$drop_foreign_keys[] = "ALTER TABLE `$database_name`.`$table_name` DROP FOREIGN KEY `$fk_symbol`;";
 				} else {
-					$drop_keys[] = "ALTER TABLE `$database_name`.`$table_name` DROP KEY $keyname;";
+					$drop_keys[] = "ALTER TABLE `$database_name`.`$table_name` DROP KEY `$keyname`;";
 				}
 			}
 			if(isset($diff['t2']) && !($diff['t2']['implicit']??false) && !($diff['t2']['defined_on_column']??false)){
