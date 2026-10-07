@@ -3,26 +3,27 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
-class Statement implements jsonSerializable {
+namespace TRP\DBTool;
+
+class Statement implements \JsonSerializable {
 	public static function modify_column($database, $table, $column_diff){
-		// Definitiondiff::generate_alter_queries
+		// DefinitionDiff::generate_alter_queries
 		return new self(StatementType::ModifyColumn, $database, $table, column_diff:$column_diff);
 	}
 
 	public static function add_column($database, $table, $column_diff){
-		// Definitiondiff::generate_alter_queries
+		// DefinitionDiff::generate_alter_queries
 		return new self(StatementType::AddColumn, $database, $table, column_diff:$column_diff);
 	}
 
 	public static function drop_column($database, $table, $column_name, $column_diff){
-		// Definitiondiff::generate_alter_queries
+		// DefinitionDiff::generate_alter_queries
 		return new self(StatementType::DropColumn, $database, $table, column_name:$column_name, column_diff:$column_diff);
 	}
 
 	public static function drop_table($database, $table){
-		// Definitiondiff->get_drop
+		// DefinitionDiff->get_drop
 		return new self(StatementType::DropTable, $database, $table);
 	}
 
@@ -39,7 +40,7 @@ class Statement implements jsonSerializable {
 		private $column_diff = null
 	){
 		$this->table_identifier = isset($database) ? "`$database`.`$table`" : "`$table`";
-		$this->use_guards = !\Config::get('ignore-dataloss');
+		$this->use_guards = !Config::get('ignore-dataloss');
 		if(!$this->use_guards || $type == StatementType::AddColumn || $this->is_safe_modify()){
 			$this->guard_state = StatementGuard::Safe;
 		}
@@ -51,7 +52,7 @@ class Statement implements jsonSerializable {
 			&& empty($this->removed_enum_values());
 	}
 
-	public function execute(mysqli $mysqli): mysqli_result|bool{
+	public function execute(\mysqli $mysqli): mysqli_result|bool{
 		if($this->is_safe($mysqli)){
 			return $mysqli->query($this->toSQL());
 		} else {
@@ -59,7 +60,7 @@ class Statement implements jsonSerializable {
 		}
 	}
 
-	public function is_safe(mysqli $mysqli): bool {
+	public function is_safe(\mysqli $mysqli): bool {
 		return match($this->guard_state){
 			StatementGuard::Safe => true,
 			StatementGuard::Unsafe => false,
@@ -67,7 +68,7 @@ class Statement implements jsonSerializable {
 		};
 	}
 
-	private function release_guard(mysqli $mysqli): bool {
+	private function release_guard(\mysqli $mysqli): bool {
 		$guard = $this->build_guard_condition();
 		if($guard === ''){
 			$this->guard_state = StatementGuard::Safe;
@@ -151,7 +152,7 @@ class Statement implements jsonSerializable {
 
 	private function removed_enum_values(){
 		$t1 = $this->t1('data_type_obj');
-		if(is_a($t1,'DataTypeEnum')){
+		if(is_a($t1,DataTypeEnum::class)){
 			$t2 = $this->t2('data_type_obj');
 			return $t1->values_diff($t2);
 		} else {

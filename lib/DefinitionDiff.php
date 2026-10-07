@@ -3,10 +3,10 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
-require_once __DIR__."/statement.php";
-class Definitiondiff {
+namespace TRP\DBTool;
+
+class DefinitionDiff {
 	static private $known_tables;
 
 	public static function reset(){
@@ -77,7 +77,7 @@ class Definitiondiff {
 			if(in_array($this->name, self::get_known_tables())){
 				$query = DB::sql("SHOW CREATE TABLE `$this->name`");
 				if($query && $query->num_rows){
-					$stmt = \Parser\statement($query->fetch_assoc()['Create Table']);
+					$stmt = Parser::statement($query->fetch_assoc()['Create Table']);
 					if(isset($stmt['error'])){
 						$this->errors[] = ['errno'=>2,'error'=>"Parse Error in database table `$stmt[name]`: $stmt[error]"];
 					}
@@ -210,11 +210,11 @@ class Definitiondiff {
 			}
 		}
 
-		$columns = self::compare_elems($file_columns, $db_columns, $file_key, $db_key, ['DefinitionDiff','column_is_equal'],
+		$columns = self::compare_elems($file_columns, $db_columns, $file_key, $db_key, [self::class,'column_is_equal'],
 			$file_table['table_options'],
 			$db_table['table_options']
 		);
-		$keys = self::compare_elems($file_indexes, $db_indexes, $file_key, $db_key, ['Definitiondiff','index_is_equal']);
+		$keys = self::compare_elems($file_indexes, $db_indexes, $file_key, $db_key, [self::class,'index_is_equal']);
 
 		if(!empty($db_table['table_options']['ENGINE'])
 			&& empty($file_table['table_options']['ENGINE'])){
@@ -235,7 +235,7 @@ class Definitiondiff {
 		$db_options = array_filter($db_table['table_options'], function($key) use ($ignore_db_only_options){
 			return !in_array($key, $ignore_db_only_options);
 		}, ARRAY_FILTER_USE_KEY);
-		$options = self::compare_elems($file_table['table_options'], $db_options, $file_key, $db_key, ['DefinitionDiff','option_is_equal']);
+		$options = self::compare_elems($file_table['table_options'], $db_options, $file_key, $db_key, [self::class,'option_is_equal']);
 
 		if(!empty($columns) || !empty($keys) || !empty($options)){
 			return ['columns'=>$columns,'keys'=>$keys,'options'=>$options];
@@ -261,7 +261,7 @@ class Definitiondiff {
 			$columns[$col['name']] = Format::column_description_to_A($col); //compatibility with web diffview
 			if(isset($col['key'])){
 				$keyname = $col['key'] == 'PRIMARY KEY' ? 'PRIMARY' : $col['name'];
-				$keycols = [\Parser\encode_index_column($col)];
+				$keycols = [Parser::encode_index_column($col)];
 				$indexcols = [['name'=>$col['name'],'sort'=>false]];
 				$keys[$keyname] = match($col['key']){
 					'UNIQUE' => ['index_type'=>'unique','index_columns'=>$indexcols,'cols'=>$keycols,'defined_on_column'=>true],
@@ -271,8 +271,8 @@ class Definitiondiff {
 			}
 		} elseif($col['type'] == 'index'){
 			unset($col['type']); //compatibility with web diffview
-			$col['cols'] = array_map('\Parser\encode_index_column', $col['index_columns']);
-			if(isset($col['index_reference_columns'])) $col['refcols'] = array_map('\Parser\encode_index_column', $col['index_reference_columns']);
+			$col['cols'] = array_map([Parser::class,'encode_index_column'], $col['index_columns']);
+			if(isset($col['index_reference_columns'])) $col['refcols'] = array_map([Parser::class,'encode_index_column'], $col['index_reference_columns']);
 			$name = $col['index_type'] == 'primary' ? 'PRIMARY' : (isset($col['name']) ? $col['name'] : $col['cols'][0]);
 			if(isset($keys[$name])){
 				$i = 1;

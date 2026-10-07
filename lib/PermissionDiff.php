@@ -3,11 +3,10 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
-
 declare(strict_types=1);
-require_once __DIR__.'/description.php';
-class Permissiondiff {
+namespace TRP\DBTool;
+
+class PermissionDiff {
 	static private $file_schema_permissions = [], $db_schema_permissions = [], $schema_changed = [];
 	private $key, $db_stmt, $file_stmt, $filenames = [], $diff_calculated = true, $grant, $revoke, $schema_change_version = 0, $schema_key;
 	private $errors = [];

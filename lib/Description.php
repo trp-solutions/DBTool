@@ -3,9 +3,10 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
-class Description implements ArrayAccess, JsonSerializable {
+namespace TRP\DBTool;
+
+class Description implements \ArrayAccess, \JsonSerializable {
 	public static function from_grant_row($row){
 		$ignore_host = defined('PERMISSION_IGNORE_HOST') && PERMISSION_IGNORE_HOST;
 		if($ignore_host){

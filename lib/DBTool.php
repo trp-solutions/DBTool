@@ -3,18 +3,14 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
-require_once __DIR__.'/config.php';
-require_once __DIR__.'/tablediff.php';
-require_once __DIR__.'/source.php';
-require_once __DIR__.'/db.php';
+namespace TRP\DBTool;
 
 class DBTool {
 	private static $batch_counter = 0;
 
 	public static function load($sources, $options){
-		if(!is_a($options, 'Config')){
+		if(!is_a($options, Config::class)){
 			Config::load($options);
 			$options = Config::get_instance();
 		}
@@ -23,7 +19,7 @@ class DBTool {
 			return self::error("Not logged in");
 		}
 		if(!Source::is_list_of($sources)){
-			if(!is_a($sources, 'Source')){
+			if(!is_a($sources, Source::class)){
 				$sources = Source::from($sources, $options->read('source'));
 			}
 			$sources = [$sources];
@@ -58,7 +54,7 @@ class DBTool {
 			$this->error = "Sources are empty";
 			$this->result = [];
 		} else {
-			$this->result = Tablediff::run($sources);
+			$this->result = TableDiff::run($sources);
 		}
 	}
 

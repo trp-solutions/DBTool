@@ -3,18 +3,20 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
+declare(strict_types=1);
+
+require_once __DIR__.'/../lib/autoload.php';
+require_once __DIR__.'/lib/heal-document/lib/HealHTML.php';
+require_once __DIR__.'/page.php';
+if(file_exists(__DIR__.'/config.php')){
+	require_once __DIR__.'/config.php';
+}
+
+use \TRP\DBTool\{Core, Config, Format, DB};
 
 $uri = $_SERVER['REQUEST_URI'];
 if(substr($uri,-1)!='/') $uri = dirname($uri).'/';
 session_set_cookie_params(['path'=>$uri]);
-
-require_once "../lib/core.php";
-require_once "../lib/format.php";
-require_once "lib/heal-document/lib/HealHTML.php";
-if(file_exists(__DIR__.'/config.php')){
-	require_once __DIR__.'/config.php';
-}
-require_once "page.php";
 
 $debug_data = [];
 function debug_collect(...$data){

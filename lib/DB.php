@@ -3,10 +3,8 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
-require_once __DIR__.'/config.php';
-require_once __DIR__.'/core.php';
+namespace TRP\DBTool;
 
 class DB {
 	private static $instance;
@@ -63,7 +61,7 @@ class DB {
 		}
 		$mysqli = self::get();
 		try{
-			if(is_a($sql, 'Statement')){
+			if(is_a($sql, Statement::class)){
 				$result = $sql->execute($mysqli);
 				if(!$result && !empty($sql->guard_warning)){
 					self::msg('error', 'SQL prevented from deleting data: '.$sql->guard_warning.' - Query: '.json_encode($sql));
@@ -122,7 +120,7 @@ class DB {
 		$password = Config::get('password');
 		if(!is_string($password)) $password = null;
 		if(isset($username) && isset($password)){
-			$mysqli = new mysqli($host, $username, $password);
+			$mysqli = new \mysqli($host, $username, $password);
 			if(!$mysqli->connect_error){
 				self::$isloggedin = true;
 			}

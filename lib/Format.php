@@ -3,9 +3,11 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
-require_once __DIR__.'/sqltype.php';
+namespace TRP\DBTool;
+
+use \TRP\DBTool\DataType\NameProxy as DataTypeNameProxy;
+
 class Format {
 	public static function prettify_create_table($sql){
 		$result = '';
@@ -194,10 +196,10 @@ class Format {
 		if(isset($old_col['datatype']['zerofill'])) $new_col['zerofill'] = $old_col['datatype']['zerofill'] ? 'YES' : 'NO';
 		if(isset($old_col['datatype']['values'])) $new_col['enum_values'] = implode(', ',$old_col['datatype']['values']);
 
-		if(is_a($old_col['datatype'], '\Datatype')){
+		if(is_a($old_col['datatype'], DataType::class)){
 			$new_col['type'] = $old_col['datatype']->string_with_attribute();
 		} else {
-			$new_col['type'] = \Parser\encode_datatype($old_col['datatype'], true);
+			$new_col['type'] = Parser::encode_datatype($old_col['datatype'], true);
 		}
 		
 

@@ -3,12 +3,8 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
-require_once __DIR__.'/config.php';
-require_once __DIR__.'/db.php';
-require_once __DIR__.'/dbtool.php';
-require_once __DIR__.'/helper.php';
+namespace TRP\DBTool;
 
 class Core {
 	public static function load_file($path){
@@ -32,16 +28,16 @@ class Core {
 
 		$configdir = realpath($configdir ?? '.');
 
-		$batches = \Helper\split_batches($json);
+		$batches = Helper::split_batches($json);
 		$objs = [];
 		foreach($batches as $batch){
 			Config::load($batch);
-			list($sqlfiles, $warnings) = \Helper\sqlfiles($configdir);
+			list($sqlfiles, $warnings) = Helper::sqlfiles($configdir);
 			self::$warnings = array_merge(self::$warnings,$warnings);
 			$objs[] = DBTool::load($sqlfiles, Config::get_instance());
 		}
 
-		\Helper\share_known_tables($objs);
+		Helper::share_known_tables($objs);
 
 		return [$objs, null];
 	}

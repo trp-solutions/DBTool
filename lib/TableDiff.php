@@ -3,15 +3,10 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
-require_once __DIR__."/permissiondiff.php";
-require_once __DIR__."/definitiondiff.php";
-require_once __DIR__."/userdiff.php";
-require_once __DIR__."/format.php";
-require_once __DIR__."/parser.php";
-require_once __DIR__.'/description.php';
-class Tablediff {
+namespace TRP\DBTool;
+
+class TableDiff {
 	const CREATE = 0b1;
 	const ALTER = 0b10;
 	const DROP = 0b100;
@@ -44,7 +39,7 @@ class Tablediff {
 			$sourcename = $source->get_name();
 			$stmts = $source->get_stmts();
 			if(is_array($stmts)) foreach($stmts as $stmt){
-				$obj = \Parser\statement($stmt, ['ignore_host'=>$ignore_host]);
+				$obj = Parser::statement($stmt, ['ignore_host'=>$ignore_host]);
 				$is_grant = $obj['type'] == 'grant' || $obj['type'] == 'revoke';
 				if($is_grant){
 					self::file_statement($obj, $sourcename);
@@ -84,7 +79,7 @@ class Tablediff {
 		self::$missing_users = [];
 		self::$database_error = null;
 		self::$skipped_statements = 0;
-		Definitiondiff::reset();
+		DefinitionDiff::reset();
 	}
 
 	static public function get($name){
@@ -96,7 +91,7 @@ class Tablediff {
 
 	static public function get_user($name){
 		if(!isset(self::$users[$name])){
-			self::$users[$name] = new Userdiff($name);
+			self::$users[$name] = new UserDiff($name);
 		}
 		return self::$users[$name];
 	}
@@ -283,7 +278,7 @@ class Tablediff {
 					$result = DB::sql("SHOW GRANTS FOR $user");
 					if($result){
 						while($row = $result->fetch_row()){
-							$obj = \Parser\statement($row[0], ['ignore_host'=>self::ignore_host()]);
+							$obj = Parser::statement($row[0], ['ignore_host'=>self::ignore_host()]);
 							if(self::desc_is_allowed($obj,$filter)){
 								self::merge_into_grants($grants, $obj);
 							}
@@ -353,13 +348,13 @@ class Tablediff {
 		$diff = self::get($name);
 		if($stmt['type'] == 'table'){
 			if(!isset($diff->definition)) {
-				$diff->definition = new Definitiondiff($name);
+				$diff->definition = new DefinitionDiff($name);
 			}
 			$diff->definition->from_file($stmt, $sourcename);
 		} elseif($stmt['type'] == 'grant' || $stmt['type'] == 'revoke'){
 			$key = $stmt['key'];
 			if(!isset($diff->permissions[$key])){
-				$diff->permissions[$key] = new Permissiondiff($key);
+				$diff->permissions[$key] = new PermissionDiff($key);
 			}
 			$diff->permissions[$key]->from_file($stmt, $sourcename);
 		}
@@ -375,13 +370,13 @@ class Tablediff {
 		$diff = self::get($name);
 		if($stmt['type'] == 'table'){
 			if(!isset($diff->definition)) {
-				$diff->definition = new Definitiondiff($name);
+				$diff->definition = new DefinitionDiff($name);
 			}
 			$diff->definition->from_database($stmt);
 		} elseif($stmt['type'] == 'grant' || $stmt['type'] == 'revoke'){
 			$key = $stmt['key'];
 			if(!isset($diff->permissions[$key])){
-				$diff->permissions[$key] = new Permissiondiff($key);
+				$diff->permissions[$key] = new PermissionDiff($key);
 			}
 			$diff->permissions[$key]->from_database($stmt);
 		}
@@ -391,7 +386,7 @@ class Tablediff {
 		$fullname = self::get_table_name(['name'=>$name,'type'=>'table']);
 		$diff = self::get($fullname);
 		if(!isset($diff->definition)) {
-			$diff->definition = new Definitiondiff($fullname);
+			$diff->definition = new DefinitionDiff($fullname);
 		}
 	}
 

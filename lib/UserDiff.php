@@ -3,9 +3,10 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
-class Userdiff {
+namespace TRP\DBTool;
+
+class UserDiff {
 	private $name, $file_stmt, $db_stmt, $parsed_user = false, $diff_calculated = false, $diff, $sources = [];
 
 	public function __construct($name){
@@ -21,7 +22,7 @@ class Userdiff {
 			$this->diff_calculated = false;
 			$this->sources[] = $source;
 		} else {
-			$this->errors[] = ['errno'=>999,'error'=>'Userdiff->from_file uses self::compare which is not implemented yet'];
+			$this->errors[] = ['errno'=>999,'error'=>'UserDiff->from_file uses self::compare which is not implemented yet'];
 			return;
 			$diff = self::compare($this->file_stmt, $stmt);
 			if($diff['is_empty']){
@@ -34,7 +35,7 @@ class Userdiff {
 	}
 
 	public function from_database($stmt){
-		$this->errors[] = ['errno'=>999,'error'=>'Userdiff->from_database is not implemented yet'];
+		$this->errors[] = ['errno'=>999,'error'=>'UserDiff->from_database is not implemented yet'];
 	}
 
 	private function get_db_stmt(){
@@ -46,7 +47,7 @@ class Userdiff {
 				$query = false;
 			}
 			if($query && $query->num_rows){
-				$stmt = \Parser\statement($query->fetch_array()[0]);
+				$stmt = Parser::statement($query->fetch_array()[0]);
 				if(isset($stmt['error'])){
 					$this->errors[] = ['errno'=>2,'error'=>"Parse Error in database user $this->name: $stmt[error]"];
 				}

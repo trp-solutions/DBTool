@@ -3,8 +3,9 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
+namespace TRP\DBTool;
+
 class Config {
 	private static $instance;
 	const ALLOWED_KEYS = ['host','user','password','variables','action','files','database','statement','source','ignore-dataloss'];
@@ -23,7 +24,7 @@ class Config {
 	}
 
 	public static function set_instance($instance){
-		if(is_a($instance, 'Config')){
+		if(is_a($instance, self::class)){
 			self::$instance = $instance;
 		}
 	}

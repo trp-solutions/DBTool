@@ -3,7 +3,10 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-require_once __DIR__."/../lib/core.php";
+declare(strict_types=1);
+require_once __DIR__."/../lib/autoload.php";
+
+use \TRP\DBTool\{Core, Config, Format, DB};
 
 function debug(...$msg){
 	echo json_encode($msg,JSON_PRETTY_PRINT)."\n";

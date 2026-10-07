@@ -3,16 +3,17 @@
 DBTool is licensed under the Apache License 2.0 license
 https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
-
 declare(strict_types=1);
+namespace TRP\DBTool;
+
 class Source {
 	static public function from($sql, $name = null){
-		if(is_a($sql,'Source')){
+		if(is_a($sql, Source::class)){
 			$source = $sql;
 		} elseif(is_string($sql)){
 			$source = new Source($name ?? 'Raw String');
 			$source->stmts = self::lines_to_statements(explode("\n",$sql));
-		} elseif(is_array($sql) && array_reduce($sql, ['Source','is_lines'], true)){
+		} elseif(is_array($sql) && array_reduce($sql, [self::class,'is_lines'], true)){
 			$source = new Source($name ?? 'Anonymous array of strings');
 			$source->stmts = self::lines_to_statements($sql);
 		} else {
@@ -27,11 +28,11 @@ class Source {
 	}
 
 	static private function is_source_list($carry, $item){
-		return $carry && is_a($item, 'Source');
+		return $carry && is_a($item, self::class);
 	}
 
 	static public function is_list_of($value){
-		return is_array($value) && array_reduce($value, ['Source','is_source_list'], true);
+		return is_array($value) && array_reduce($value, [self::class,'is_source_list'], true);
 	}
 
 	public $error, $warnings = [];
