@@ -1,7 +1,7 @@
 <?php
 /*
 DBTool is licensed under the Apache License 2.0 license
-https://github.com/TRP-Solutions/dbtool/blob/master/LICENSE
+https://github.com/trp-solutions/DBTool/blob/main/LICENSE
 */
 require_once __DIR__."/../lib/core.php";
 
